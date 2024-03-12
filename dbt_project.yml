@@ -34,7 +34,9 @@ clean-targets:         # directories to be removed by `dbt clean`
 # using the `{{ config(...) }}` macro.
 models:
   dbtlearn:
-    +materialized: view
+    +database: airbnb
+    +transient: false
+    +materialized: table
     +post-hook:
       - "GRANT SELECT ON {{ this }} TO ROLE REPORTER"
     dim:
