@@ -1,0 +1,28 @@
+version: 2
+seeds:
+  - name: employee_details
+    config: 
+      schema: std_seeds
+      # delimiter: "|"
+      + column_types : 
+        Id: number(1000)
+        Name: varchar(50) 
+        constraints:
+        - type: primary_keys
+          columns: [Id]
+
+  - name: student_details
+    description: One record per student
+    config:
+      schema: std_seeds
+      + column_types : 
+        roll_no: number(1000)
+        student_name: varchar(50)
+
+
+  - name: full_moon_seeds
+    config:
+      database : dbt_course
+      schema: stg_seeds
+      + column_types :
+        full_moon_date : Date

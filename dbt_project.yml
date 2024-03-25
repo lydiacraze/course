@@ -7,7 +7,7 @@ version: '1.0.0'
 config-version: 2
 
 # This setting configures which "profile" dbt uses for this project.
-profile: 'dbtlearn'
+profile: 'default'
 
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
@@ -18,7 +18,8 @@ test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
-asset-paths: ["assets"]
+docs-paths: ["docs"]
+packages-install-path: "packages"
 
 target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`
@@ -34,3 +35,16 @@ clean-targets:         # directories to be removed by `dbt clean`
 # using the `{{ config(...) }}` macro.
 models:
   dbtlearn:
+    +schema: learn_again
+    +transient: false
+    src:
+      +materialized: table
+    mart:
+      +tags: hourly
+      +materialized: table
+    fct:
+      +materialized : incremental
+    dim:
+      +materialized : table
+seeds:
+  +schema: stg_seeds
