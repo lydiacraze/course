@@ -1,0 +1,26 @@
+version: 2
+
+models:
+
+  - name: stg_customers
+
+    columns:
+
+      - name: CUSTOMER_ID
+        tests:
+          - unique
+          - not_null
+
+      - name: EMAIL
+        tests:
+          - not_null
+
+
+  - name: stg_orders
+
+    columns:
+
+      - name: ORDER_ID
+        tests:
+          - unique
+          - not_null 

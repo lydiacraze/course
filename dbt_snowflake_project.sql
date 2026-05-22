@@ -1,0 +1,36 @@
+name: 'dbt_snowflake_project'
+version: '1.0.0'
+config-version: 2
+
+profile: 'dbt_snowflake_project'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+
+  dbt_snowflake_project:
+
+    staging:
+      +materialized: view
+      +database: STAGING
+      +schema: CLEAN
+
+    intermediate:
+      +materialized: table
+      +database: STAGING
+      +schema: INTERMEDIATE
+
+    curated:
+      +materialized: table
+      +database: GOLDEN_LAYER_DB
+      +schema: ANALYTICS  
