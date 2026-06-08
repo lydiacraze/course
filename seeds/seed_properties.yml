@@ -2,7 +2,7 @@ version: 2
 seeds:
   - name: employee_details
     config: 
-      schema: std_seeds
+      schema: stg_seeds
       # delimiter: "|"
       + column_types : 
         Id: number(1000)
@@ -20,9 +20,7 @@ seeds:
         student_name: varchar(50)
 
 
-  - name: full_moon_seeds
+  - name: full_moon_dates
     config:
-      database : dbt_course
-      schema: stg_seeds
       + column_types :
         full_moon_date : Date

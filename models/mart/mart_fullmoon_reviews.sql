@@ -1,12 +1,19 @@
 {{ config(
-  materialized = 'table',
+  materialized = 'incremental',
+  incremental_strategy='microbatch',
+  event_time='review_date',
+  begin='2009-06-20',
+  batch_size='year',
+  full_refresh=false,
+  tags = ['fact'],
+  schema='mart'
 ) }}
 
 WITH fct_reviews AS (
     SELECT * FROM {{ ref('fct_reviews') }}
 ),
 full_moon_dates AS (
-    SELECT * FROM {{ ref('full_moon_seeds') }}
+    SELECT * FROM {{ ref('seed_full_moon_dates') }}
 )
 
 SELECT

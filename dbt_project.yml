@@ -35,16 +35,21 @@ clean-targets:         # directories to be removed by `dbt clean`
 # using the `{{ config(...) }}` macro.
 models:
   dbtlearn:
-    +schema: learn_again
+    +database: airbnb
     +transient: false
     src:
       +materialized: table
+      +schema: src
     mart:
       +tags: hourly
       +materialized: table
+      +schema: mart
     fct:
       +materialized : incremental
+      +schema: mart
     dim:
       +materialized : table
+      +schema: dim
 seeds:
+  +database: airbnb
   +schema: stg_seeds

@@ -1,22 +1,26 @@
-
+{#
+  You might have `view` as the materialization as we only 
+  replace `materialized` with `table` when we implement constraints. 
+#}
 {{
-    config(
-        materialized='view'
+  config(
+    materialized = 'table' 
     )
-}}
-
-with final as (
-    select * from {{ ref('src_hosts') }}
+}} 
+WITH src_hosts AS (
+    SELECT
+        *
+    FROM
+        {{ ref('src_hosts') }}
 )
-
-select 
+SELECT
     host_id,
-        NVL(
+    NVL(
         host_name,
-        'Anonymous'
+        'N/A'
     ) AS host_name,
     is_superhost,
     created_at,
     updated_at
-
-from final
+FROM
+    src_hosts

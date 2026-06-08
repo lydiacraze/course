@@ -1,162 +1,128 @@
-version: 2
-
 models:
-
-  # =====================================================
-  # STG_CUSTOMER
-  # =====================================================
-
-  - name: stg_customer
-    description: Staging table for customer master data
-
+  - name: dim_listings_cleansed
+    description: Cleansed table which contains Airbnb listings.
+    data_tests:
+      - minimum_row_count:
+          arguments:
+            min_row_count: 1000
+          config:
+            severity: error
     columns:
-
-      - name: customer_id
-        description: Primary key of customer table
-        tests:
+      - name: listing_id
+        description: Primary key for the listing
+        data_tests:
           - unique
           - not_null
 
-      - name: first_name
-        description: Customer first name
-        tests:
+      - name: host_id
+        description: The hosts's id. References the host table.
+        data_tests:
           - not_null
-
-      - name: last_name
-        description: Customer last name
-        tests:
-          - not_null
-
-      - name: email_address
-        description: Customer email address
-
-  # =====================================================
-  # STG_PRODUCT
-  # =====================================================
-
-  - name: stg_product
-    description: Staging table for products
-
-    columns:
-
-      - name: product_id
-        description: Primary key of product table
-        tests:
-          - unique
-          - not_null
-
-      - name: product_name
-        description: Product name
-        tests:
-          - not_null
-
-      - name: product_category_id
-        description: Product category foreign key
-        tests:
           - relationships:
-              to: ref('stg_productcategory')
-              field: product_category_id
+              arguments:
+                to: ref('dim_hosts_cleansed')
+                field: host_id
 
-      - name: standard_cost
-        description: Product standard manufacturing cost
-        tests:
-          - not_null
+      - name: room_type
+        description: Type of the apartment / room
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Entire home/apt',
+                        'Private room',
+                        'Shared room',
+                        'Hotel room']
 
-      - name: list_price
-        description: Product selling price
-        tests:
-          - not_null
+      - name: minimum_nights
+        description: '{{ doc("dim_listing_cleansed__minimum_nights") }}'
+        data_tests:
+          - positive_values
 
-  # =====================================================
-  # STG_PRODUCTCATEGORY
-  # =====================================================
-
-  - name: stg_productcategory
-    description: Product category hierarchy table
-
+  - name: dim_hosts_cleansed
+    versions:
+      - v: 1
+        defined_in: dim_hosts_cleansed
+        deprecation_date: 2030-01-01
+      - v: 2
+        columns:
+          - include: '*'
+            exclude: [host_name]
+          - name: host_name
+            description: The name of the host (N/A if not available)
+            data_type: string
+            constraints:
+              - type: not_null
+    latest_version: 2
+    description: Cleansed table for the Airbnb hosts
+    config:
+      contract:
+        enforced: true
     columns:
-
-      - name: product_category_id
-        description: Primary key of category table
-        tests:
+      - name: host_id
+        description: The id of the host. This is the primary key.
+        data_type: integer
+        constraints:
+          - type: not_null
+        data_tests:
           - unique
-          - not_null
+      
+      - name: host_name
+        description: The name of the host
+        data_type: string
+        constraints:
+          - type: not_null
+      
+      - name: is_superhost
+        description: Defines whether the hosts is a superhost.
+        data_type: string
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['t', 'f']
 
-      - name: category_name
-        description: Name of product category
-        tests:
-          - not_null
+      - name: updated_at
+        data_type: timestamp
 
-  # =====================================================
-  # STG_SALESORDERHEADER
-  # =====================================================
+      - name: created_at
+        data_type: timestamp
 
-  - name: stg_salesorderheader
-    description: Sales order header table
-
+  - name: dim_listings_w_hosts
+    data_tests:
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          arguments:
+            compare_model: source('airbnb', 'listings')
     columns:
+      - name: price
+        data_tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              arguments:
+                column_type: number
+          - dbt_expectations.expect_column_quantile_values_to_be_between:
+              arguments:
+                quantile: .99
+                min_value: 50
+                max_value: 500
+          - dbt_expectations.expect_column_max_to_be_between:
+              arguments:
+                max_value: 5000
+              config:
+                severity: warn
 
-      - name: sales_order_id
-        description: Primary key of sales order header
-        tests:
-          - unique
-          - not_null
-
-      - name: customer_id
-        description: Foreign key to customer table
-        tests:
-          - relationships:
-              to: ref('stg_customer')
-              field: customer_id
-
-      - name: order_date
-        description: Date customer placed order
-        tests:
-          - not_null
-
-      - name: total_due
-        description: Final order amount
-
-  # =====================================================
-  # STG_SALESORDERDETAIL
-  # =====================================================
-
-  - name: stg_salesorderdetail
-    description: Sales order line items
-
+  - name: fct_reviews
     columns:
-
-      - name: sales_order_detail_id
-        description: Primary key of sales order detail
-        tests:
-          - unique
-          - not_null
-
-      - name: sales_order_id
-        description: Foreign key to sales order header
-        tests:
+      - name: listing_id
+        data_tests:
           - relationships:
-              to: ref('stg_salesorderheader')
-              field: sales_order_id
+              arguments:
+                to: ref('dim_listings_cleansed')
+                field: listing_id
 
-      - name: product_id
-        description: Foreign key to product table
-        tests:
-          - relationships:
-              to: ref('stg_product')
-              field: product_id
-
-      - name: order_qty
-        description: Quantity ordered
-        tests:
+      - name: reviewer_name
+        data_tests:
           - not_null
-
-      - name: unit_price
-        description: Selling price per product
-        tests:
-          - not_null
-
-      - name: line_total
-        description: Total amount for line item
-        tests:
-          - not_null
+      
+      - name: review_sentiment
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['positive', 'neutral', 'negative']
