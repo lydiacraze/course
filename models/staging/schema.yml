@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: stg_ecommerce__customers
+    description: "One row per customer, cleaned and renamed from the raw source."
+    columns:
+      - name: customer_id
+        description: "Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: email
+        tests:
+          - not_null
+      - name: plan_tier
+        tests:
+          - accepted_values:
+              values: ['basic', 'standard', 'premium']
+
+  - name: stg_ecommerce__orders
+    description: "One row per order."
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_ecommerce__customers')
+              field: customer_id
+      - name: order_status
+        tests:
+          - accepted_values:
+              values: ['completed', 'cancelled', 'refunded']
+
+  - name: stg_ecommerce__payments
+    description: "One row per payment attempt, amounts converted from cents to dollars."
+    columns:
+      - name: payment_id
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_ecommerce__orders')
+              field: order_id
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['success', 'failure', 'refunded']
