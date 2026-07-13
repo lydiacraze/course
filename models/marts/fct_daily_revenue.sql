@@ -33,3 +33,5 @@ daily as (
 )
 
 select * from daily
+
+
