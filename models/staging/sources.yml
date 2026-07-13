@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: ecommerce
+    database: dbt_ecommerce
+    schema: raw
+    description: "Raw tables loaded from S3 via Snowflake external stage / COPY INTO."
+    # loaded_at_field: _loaded_at
+    # freshness:
+    #   warn_after: {count: 12, period: hour}
+    #   error_after: {count: 24, period: hour}
+    tables:
+      - name: raw_customers
+        description: "Raw customer records loaded from customers.csv in S3."
+      - name: raw_orders
+        description: "Raw order records loaded from orders.csv in S3."
+      - name: raw_payments
+        description: "Raw payment records loaded from payments.csv in S3 (Stripe-style, amounts in cents, UTC timestamps)."
