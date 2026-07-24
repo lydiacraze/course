@@ -1,0 +1,40 @@
+semantic_models:
+
+  - name: daily_revenue
+
+    model: ref('fact_daily_revenue')
+
+    description: Daily revenue fact
+
+    defaults:
+      agg_time_dimension: order_date
+
+    entities:
+
+      - name: order_date
+        type: natural
+
+    dimensions:
+
+      - name: order_date
+        type: time
+
+        type_params:
+          time_granularity: day
+
+    measures:
+
+      - name: total_orders
+        agg: sum
+
+      - name: successful_revenue
+        expr: successful_revenue_usd
+        agg: sum
+
+      - name: refunded_amount
+        expr: refunded_amount_usd
+        agg: sum
+
+      - name: failed_amount
+        expr: failed_amount_usd
+        agg: sum

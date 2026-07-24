@@ -1,0 +1,50 @@
+semantic_models:
+  - name: customers
+
+    model: ref('dim_customers')
+
+    description: Customer dimension
+
+    entities:
+      - name: customer
+        type: primary
+        expr: customer_id
+
+    dimensions:
+
+      - name: customer_name
+        type: categorical
+
+      - name: plan_tier
+        type: categorical
+
+      - name: country_code
+        type: categorical
+
+      - name: signup_date
+        type: time
+
+        type_params:
+          time_granularity: day
+
+      - name: first_order_date
+        type: time
+
+        type_params:
+          time_granularity: day
+
+      - name: most_recent_order_date
+        type: time
+
+        type_params:
+          time_granularity: day
+
+    measures:
+
+      - name: lifetime_orders
+        description: Total orders per customer
+        agg: sum
+
+      - name: lifetime_successful_revenue_usd
+        description: Lifetime revenue
+        agg: sum
