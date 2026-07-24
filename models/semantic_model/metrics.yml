@@ -1,0 +1,55 @@
+metrics:
+
+  - name: total_orders
+
+    label: Total Orders
+
+    type: simple
+
+    type_params:
+      measure: total_orders
+
+  - name: total_revenue
+
+    label: Total Revenue
+
+    type: simple
+
+    type_params:
+      measure: successful_revenue
+
+  - name: total_refunds
+
+    label: Total Refunds
+
+    type: simple
+
+    type_params:
+      measure: refunded_amount
+
+  - name: failed_payments
+
+    label: Failed Payments
+
+    type: simple
+
+    type_params:
+      measure: failed_amount
+
+  - name: customer_lifetime_revenue
+
+    label: Customer Lifetime Revenue
+
+    type: simple
+
+    type_params:
+      measure: lifetime_successful_revenue_usd
+
+  - name: customer_lifetime_orders
+
+    label: Customer Lifetime Orders
+
+    type: simple
+
+    type_params:
+      measure: lifetime_orders
